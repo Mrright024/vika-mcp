@@ -1,13 +1,14 @@
 {
   "name": "vika-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vika MCP server over stdio.",
   "type": "module",
   "bin": {
-    "vika-mcp": "./dist/index.js"
+    "vika-mcp": "./bin/vika-mcp.js"
   },
   "main": "./dist/index.js",
   "files": [
+    "bin",
     "dist",
     "README.md",
     "README.zh-CN.md"
