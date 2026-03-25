@@ -49,7 +49,7 @@ If you want MCPorter to start the published npm package directly, add an entry l
 ```json
 {
   "mcpServers": {
-    "vika": {
+    "vika-mcp": {
       "command": "npx",
       "args": [
         "-y",
@@ -77,7 +77,7 @@ If you prefer using the cloned source tree instead of the published package, bui
 ```json
 {
   "mcpServers": {
-    "vika": {
+    "vika-mcp": {
       "command": "node",
       "args": [
         "C:/path/to/vika-mcp/dist/index.js"
@@ -112,19 +112,12 @@ node dist/index.js
 
 This repository also includes a skill at `skills/vika-mcp/`.
 
-Use it when you want an agent to follow the recommended `vika-mcp` workflow instead of guessing raw API calls or tool order. The skill helps with:
+Use it when you want an agent to follow the recommended `vika-mcp` workflow instead of guessing raw API calls or tool order. The skill is aligned with the MCP package tool surface and helps with:
 
 - resolving spaces, nodes, and datasheets from names
 - inspecting fields before record writes
 - using `fieldKey: "id"` when possible
 - handling destructive tools and deployment-sensitive endpoints safely
-
-Install the skill by copying or symlinking the folder into your Codex skills directory:
-
-```bash
-mkdir -p ~/.codex/skills
-cp -R skills/vika-mcp ~/.codex/skills/vika-mcp
-```
 
 Then invoke it explicitly in prompts such as:
 

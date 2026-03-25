@@ -49,7 +49,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 ```json
 {
   "mcpServers": {
-    "vika": {
+    "vika-mcp": {
       "command": "npx",
       "args": [
         "-y",
@@ -77,7 +77,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 ```json
 {
   "mcpServers": {
-    "vika": {
+    "vika-mcp": {
       "command": "node",
       "args": [
         "C:/path/to/vika-mcp/dist/index.js"
@@ -112,19 +112,12 @@ node dist/index.js
 
 这个仓库还附带了一份skill，位于 `skills/vika-mcp/`。
 
-当你希望 agent 按推荐的 `vika-mcp` 使用方式工作，而不是自己猜 HTTP 调用或工具顺序时，就应该配合这个 skill 使用。它主要帮助 agent：
+当你希望 agent 按推荐的 `vika-mcp` 使用方式工作，而不是自己猜 HTTP 调用或工具顺序时，就应该配合这个 skill 使用。它和 MCP 包暴露的工具面保持一致，主要帮助 agent：
 
 - 先从名称解析 space、node 和 datasheet
 - 在写记录前先读取字段信息
 - 优先使用 `fieldKey: "id"`
 - 更稳妥地处理 destructive 工具和部署敏感接口
-
-可以把这个 skill 复制或软链接到本地 Codex skills 目录：
-
-```bash
-mkdir -p ~/.codex/skills
-cp -R skills/vika-mcp ~/.codex/skills/vika-mcp
-```
 
 之后可以在提示词里显式触发，例如：
 
