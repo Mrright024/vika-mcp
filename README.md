@@ -108,6 +108,33 @@ npm run build
 node dist/index.js
 ```
 
+### Agent Skill
+
+This repository also includes a skill at `skills/vika-mcp/`.
+
+Use it when you want an agent to follow the recommended `vika-mcp` workflow instead of guessing raw API calls or tool order. The skill helps with:
+
+- resolving spaces, nodes, and datasheets from names
+- inspecting fields before record writes
+- using `fieldKey: "id"` when possible
+- handling destructive tools and deployment-sensitive endpoints safely
+
+Install the skill by copying or symlinking the folder into your Codex skills directory:
+
+```bash
+mkdir -p ~/.codex/skills
+cp -R skills/vika-mcp ~/.codex/skills/vika-mcp
+```
+
+Then invoke it explicitly in prompts such as:
+
+```text
+Use $vika-mcp to inspect the datasheet named "Leads" and list its fields.
+Use $vika-mcp to update record rec123 in datasheet dst456.
+```
+
+The skill complements the MCP server. It does not replace MCP configuration; the `vika-mcp` server still needs to be available to the agent.
+
 ## Tool Surface
 
 - Discovery: `vika_spaces_list`, `vika_nodes_list`, `vika_nodes_children_list`, `vika_nodes_search`, `vika_resolve_node`, `vika_resolve_datasheet`

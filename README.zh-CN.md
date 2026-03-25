@@ -108,6 +108,33 @@ npm run build
 node dist/index.js
 ```
 
+### Agent Skill
+
+这个仓库还附带了一份skill，位于 `skills/vika-mcp/`。
+
+当你希望 agent 按推荐的 `vika-mcp` 使用方式工作，而不是自己猜 HTTP 调用或工具顺序时，就应该配合这个 skill 使用。它主要帮助 agent：
+
+- 先从名称解析 space、node 和 datasheet
+- 在写记录前先读取字段信息
+- 优先使用 `fieldKey: "id"`
+- 更稳妥地处理 destructive 工具和部署敏感接口
+
+可以把这个 skill 复制或软链接到本地 Codex skills 目录：
+
+```bash
+mkdir -p ~/.codex/skills
+cp -R skills/vika-mcp ~/.codex/skills/vika-mcp
+```
+
+之后可以在提示词里显式触发，例如：
+
+```text
+Use $vika-mcp to inspect the datasheet named "Leads" and list its fields.
+Use $vika-mcp to update record rec123 in datasheet dst456.
+```
+
+这个 skill 只是对 MCP 的补充，不会替代 MCP 配置本身。agent 仍然需要先能访问 `vika-mcp` 服务器。
+
 ## 工具列表
 
 - 发现类：`vika_spaces_list`、`vika_nodes_list`、`vika_nodes_children_list`、`vika_nodes_search`、`vika_resolve_node`、`vika_resolve_datasheet`
