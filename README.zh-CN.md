@@ -24,7 +24,19 @@
 
 ## 用法
 
-先执行构建，然后让你的 MCP 客户端指向 `vika-mcp` 二进制，或直接指向 `node dist/index.js`。
+先从 npm 安装：
+
+```bash
+npm install -g vika-mcp
+```
+
+然后让你的 MCP 客户端指向 `vika-mcp` 可执行文件。
+
+如果你不想全局安装，也可以直接运行：
+
+```bash
+npx -y vika-mcp
+```
 
 服务端只调用 `/fusion/v1` 和 `/fusion/v2` 下的公开 REST 接口，不会探测站点根路径，从而避免部分部署场景下的 SafeLine 根路径拦截问题。
 
@@ -32,15 +44,16 @@
 
 MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用户级配置 `~/.mcporter/mcporter.json`。
 
-执行 `npm run build` 后，可以加入类似下面的配置：
+如果你希望 MCPorter 直接启动已发布的 npm 包，可以使用下面的配置：
 
 ```json
 {
   "mcpServers": {
     "vika": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "C:/path/to/vika-mcp/dist/index.js"
+        "-y",
+        "vika-mcp"
       ],
       "env": {
         "VIKA_HOST": "https://vika.cn",
@@ -55,16 +68,44 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 
 说明：
 
-- 将 `C:/path/to/vika-mcp/dist/index.js` 替换为当前仓库编译产物的绝对路径。
 - `https://vika.cn` 是公开云版本的官方示例地址。本文中的 token 和路径仍为公开文档使用的占位值，不包含任何真实环境信息。
 - `${VIKA_TOKEN}` 表示由 MCPorter 从当前 shell 环境读取 token。也可以直接写死，但环境变量更安全。
 - 如果你的私有部署使用自签名证书，可以在 `env` 中加入 `"VIKA_ALLOW_INSECURE_TLS": "true"`。
+
+如果你更希望直接使用本仓库源码而不是已发布 npm 包，请先构建，再让 MCPorter 指向编译产物：
+
+```json
+{
+  "mcpServers": {
+    "vika": {
+      "command": "node",
+      "args": [
+        "C:/path/to/vika-mcp/dist/index.js"
+      ],
+      "env": {
+        "VIKA_HOST": "https://vika.cn",
+        "VIKA_TOKEN": "${VIKA_TOKEN}"
+      }
+    }
+  }
+}
+```
 
 使用 MCPorter 的快速验证命令：
 
 ```bash
 npx mcporter list vika --schema
 npx mcporter call vika.vika_spaces_list
+```
+
+### 开发模式
+
+如果你是直接在这个仓库里开发，可以这样启动：
+
+```bash
+npm install
+npm run build
+node dist/index.js
 ```
 
 ## 工具列表

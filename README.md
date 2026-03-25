@@ -24,7 +24,19 @@ TypeScript MCP server for Vika datasheets over `stdio`.
 
 ## Usage
 
-Build first, then point your MCP client to the `vika-mcp` binary or `node dist/index.js`.
+Install from npm:
+
+```bash
+npm install -g vika-mcp
+```
+
+Then point your MCP client to the `vika-mcp` binary.
+
+You can also run it without a global install:
+
+```bash
+npx -y vika-mcp
+```
 
 The server only talks to documented REST endpoints under `/fusion/v1` and `/fusion/v2`. It does not probe the site root, which avoids SafeLine root-page blocking.
 
@@ -32,15 +44,16 @@ The server only talks to documented REST endpoints under `/fusion/v1` and `/fusi
 
 MCPorter reads project-local config from `config/mcporter.json` or a user-level config from `~/.mcporter/mcporter.json`.
 
-After `npm run build`, add an entry like this:
+If you want MCPorter to start the published npm package directly, add an entry like this:
 
 ```json
 {
   "mcpServers": {
     "vika": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "C:/path/to/vika-mcp/dist/index.js"
+        "-y",
+        "vika-mcp"
       ],
       "env": {
         "VIKA_HOST": "https://vika.cn",
@@ -55,16 +68,44 @@ After `npm run build`, add an entry like this:
 
 Notes:
 
-- Replace `C:/path/to/vika-mcp/dist/index.js` with the absolute path to this repo's built entry file.
 - `https://vika.cn` is the official public-cloud host example. The token and file paths in this README are placeholders intended for public documentation.
 - `${VIKA_TOKEN}` assumes MCPorter will read the token from your shell environment. You can also inline the token directly, but an environment variable is safer.
 - If your private deployment uses a self-signed certificate, add `"VIKA_ALLOW_INSECURE_TLS": "true"` under `env`.
+
+If you prefer using the cloned source tree instead of the published package, build first and point MCPorter to the compiled entry file:
+
+```json
+{
+  "mcpServers": {
+    "vika": {
+      "command": "node",
+      "args": [
+        "C:/path/to/vika-mcp/dist/index.js"
+      ],
+      "env": {
+        "VIKA_HOST": "https://vika.cn",
+        "VIKA_TOKEN": "${VIKA_TOKEN}"
+      }
+    }
+  }
+}
+```
 
 Quick verification with MCPorter:
 
 ```bash
 npx mcporter list vika --schema
 npx mcporter call vika.vika_spaces_list
+```
+
+### Development
+
+If you are working from this repository directly:
+
+```bash
+npm install
+npm run build
+node dist/index.js
 ```
 
 ## Tool Surface
