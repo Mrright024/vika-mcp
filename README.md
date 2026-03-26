@@ -10,17 +10,14 @@ TypeScript MCP server for Vika datasheets over `stdio`.
 - `VIKA_TOKEN`: required, API token
 - `VIKA_TIMEOUT_MS`: optional, defaults to `15000`
 - `VIKA_ALLOW_INSECURE_TLS`: optional, defaults to `false`
+- `VIKA_PROXY_URL`: optional, use a single proxy for all Vika traffic, example `http://127.0.0.1:7890`
 - `VIKA_LOG_LEVEL`: optional, one of `debug`, `info`, `warn`, `error`
-- `VIKA_TEST_SPACE_ID`: required for smoke tests
-- `VIKA_TEST_NODE_ID`: required for smoke tests
-- `VIKA_TEST_DATASHEET_ID`: required for smoke tests
 
 ## Scripts
 
 - `npm run build`
 - `npm run check`
 - `npm test`
-- `npm run smoke`
 
 ## Usage
 
@@ -58,6 +55,7 @@ If you want MCPorter to start the published npm package directly, add an entry l
       "env": {
         "VIKA_HOST": "https://vika.cn",
         "VIKA_TOKEN": "${VIKA_TOKEN}",
+        "VIKA_PROXY_URL": "http://127.0.0.1:7890",
         "VIKA_TIMEOUT_MS": "15000",
         "VIKA_LOG_LEVEL": "info"
       }
@@ -70,6 +68,7 @@ Notes:
 
 - `https://vika.cn` is the official public-cloud host example. The token and file paths in this README are placeholders intended for public documentation.
 - `${VIKA_TOKEN}` assumes MCPorter will read the token from your shell environment. You can also inline the token directly, but an environment variable is safer.
+- `VIKA_PROXY_URL` is the simplest way to force all Vika traffic through a single proxy.
 - If your private deployment uses a self-signed certificate, add `"VIKA_ALLOW_INSECURE_TLS": "true"` under `env`.
 
 If you prefer using the cloned source tree instead of the published package, build first and point MCPorter to the compiled entry file:
@@ -143,18 +142,6 @@ The skill complements the MCP server. It does not replace MCP configuration; the
 - Delete operations and schema-changing operations require `confirm_destructive: true`.
 - Query serialization follows the official Vika JS SDK bracket style, such as `recordIds[]`.
 - View mutations, org APIs, and AI endpoints are deployment-sensitive. If your private deployment does not expose them, the server returns `feature_unavailable`.
-
-## Smoke Test Overrides
-
-The smoke script requires `VIKA_TEST_SPACE_ID`, `VIKA_TEST_NODE_ID`, and `VIKA_TEST_DATASHEET_ID`.
-
-Optional overrides:
-
-- `VIKA_SMOKE_TEXT_FIELD_JSON`
-- `VIKA_SMOKE_ATTACHMENT_FIELD_JSON`
-- `VIKA_SMOKE_VIEW_JSON`
-
-If these are not provided, the smoke script uses default payloads based on the public API field and view type names.
 
 ## License
 

@@ -70,9 +70,9 @@ async function main(): Promise<void> {
   const client = new VikaClient(config, logger.child({ component: 'client' }), capabilities);
   const resolvers = new ResolverService(client);
 
-  const spaceId = requireEnv('VIKA_TEST_SPACE_ID', config.testSpaceId);
-  const nodeId = requireEnv('VIKA_TEST_NODE_ID', config.testNodeId);
-  const datasheetId = requireEnv('VIKA_TEST_DATASHEET_ID', config.testDatasheetId);
+  const spaceId = requireEnv('VIKA_TEST_SPACE_ID', process.env.VIKA_TEST_SPACE_ID);
+  const nodeId = requireEnv('VIKA_TEST_NODE_ID', process.env.VIKA_TEST_NODE_ID);
+  const datasheetId = requireEnv('VIKA_TEST_DATASHEET_ID', process.env.VIKA_TEST_DATASHEET_ID);
   const prefix = `mcp_smoke_${Date.now()}`;
 
   const cleanup: Array<() => Promise<void>> = [];

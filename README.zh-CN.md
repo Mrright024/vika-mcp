@@ -10,17 +10,14 @@
 - `VIKA_TOKEN`: 必填，Vika API Token
 - `VIKA_TIMEOUT_MS`: 可选，默认 `15000`
 - `VIKA_ALLOW_INSECURE_TLS`: 可选，默认 `false`
+- `VIKA_PROXY_URL`: 可选，为所有 Vika 请求指定统一代理，例如 `http://127.0.0.1:7890`
 - `VIKA_LOG_LEVEL`: 可选，可选值为 `debug`、`info`、`warn`、`error`
-- `VIKA_TEST_SPACE_ID`: smoke test 必填
-- `VIKA_TEST_NODE_ID`: smoke test 必填
-- `VIKA_TEST_DATASHEET_ID`: smoke test 必填
 
 ## 脚本
 
 - `npm run build`
 - `npm run check`
 - `npm test`
-- `npm run smoke`
 
 ## 用法
 
@@ -58,6 +55,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
       "env": {
         "VIKA_HOST": "https://vika.cn",
         "VIKA_TOKEN": "${VIKA_TOKEN}",
+        "VIKA_PROXY_URL": "http://127.0.0.1:7890",
         "VIKA_TIMEOUT_MS": "15000",
         "VIKA_LOG_LEVEL": "info"
       }
@@ -70,6 +68,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 
 - `https://vika.cn` 是公开云版本的官方示例地址。本文中的 token 和路径仍为公开文档使用的占位值，不包含任何真实环境信息。
 - `${VIKA_TOKEN}` 表示由 MCPorter 从当前 shell 环境读取 token。也可以直接写死，但环境变量更安全。
+- `VIKA_PROXY_URL` 是最简单的代理方式，会让全部 Vika 请求走同一个代理。
 - 如果你的私有部署使用自签名证书，可以在 `env` 中加入 `"VIKA_ALLOW_INSECURE_TLS": "true"`。
 
 如果你更希望直接使用本仓库源码而不是已发布 npm 包，请先构建，再让 MCPorter 指向编译产物：
@@ -143,18 +142,6 @@ Use $vika-mcp to update record rec123 in datasheet dst456.
 - 删除操作和变更 schema 的操作都要求显式传入 `confirm_destructive: true`。
 - 查询参数序列化遵循官方 Vika JS SDK 的 bracket 风格，例如 `recordIds[]`。
 - 视图变更、组织接口和 AI 接口是否可用取决于具体部署。如果部署未开放这些接口，服务会返回 `feature_unavailable`。
-
-## Smoke Test 覆盖项
-
-smoke 脚本要求提供 `VIKA_TEST_SPACE_ID`、`VIKA_TEST_NODE_ID` 和 `VIKA_TEST_DATASHEET_ID`。
-
-可选覆盖项：
-
-- `VIKA_SMOKE_TEXT_FIELD_JSON`
-- `VIKA_SMOKE_ATTACHMENT_FIELD_JSON`
-- `VIKA_SMOKE_VIEW_JSON`
-
-如果未提供这些值，smoke 脚本会根据公开 API 的字段类型和视图类型名称使用默认 payload。
 
 ## 许可证
 

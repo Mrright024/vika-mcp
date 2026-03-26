@@ -21,8 +21,7 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "prepack": "npm run build",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "smoke": "tsx tests/smoke/smoke.ts"
+    "test:watch": "vitest"
   },
   "keywords": [
     "mcp",

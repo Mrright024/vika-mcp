@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import qs from 'qs';
-import { Agent } from 'undici';
+import { Agent, ProxyAgent } from 'undici';
 
 import type { AppConfig } from '../config.js';
 import { CapabilityRegistry } from '../capabilities.js';
@@ -68,7 +68,7 @@ function createMeta(
 }
 
 export class VikaClient {
-  private readonly dispatcher?: Agent;
+  private readonly dispatcher?: Agent | ProxyAgent;
 
   private readonly fetchImpl: typeof fetch;
 
@@ -79,13 +79,7 @@ export class VikaClient {
     fetchImpl?: typeof fetch,
   ) {
     this.fetchImpl = fetchImpl ?? fetch;
-    if (config.allowInsecureTls) {
-      this.dispatcher = new Agent({
-        connect: {
-          rejectUnauthorized: false,
-        },
-      });
-    }
+    this.dispatcher = this.createDispatcher();
   }
 
   public async request<T = unknown>(options: RequestOptions): Promise<{ data: T; meta: ResponseMeta }> {
@@ -132,7 +126,7 @@ export class VikaClient {
           body,
           signal: controller.signal,
           dispatcher: this.dispatcher,
-        } as RequestInit & { dispatcher?: Agent });
+        } as RequestInit & { dispatcher?: Agent | ProxyAgent });
 
         const parsed = await this.parseResponse<T>(response);
         const meta = createMeta(
@@ -212,6 +206,34 @@ export class VikaClient {
     const form = new FormData();
     form.append('file', file);
     return form;
+  }
+
+  private createDispatcher(): Agent | ProxyAgent | undefined {
+    const tlsOptions = this.config.allowInsecureTls
+      ? {
+          rejectUnauthorized: false,
+        }
+      : undefined;
+
+    if (this.config.proxyUrl) {
+      return new ProxyAgent({
+        uri: this.config.proxyUrl,
+        ...(tlsOptions
+          ? {
+              requestTls: tlsOptions,
+              proxyTls: tlsOptions,
+            }
+          : {}),
+      });
+    }
+
+    if (tlsOptions) {
+      return new Agent({
+        connect: tlsOptions,
+      });
+    }
+
+    return undefined;
   }
 
   private buildUrl(path: string, version: ApiVersion, query?: QueryParams): string {

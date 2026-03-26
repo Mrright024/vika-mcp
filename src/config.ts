@@ -7,10 +7,8 @@ const envSchema = z.object({
   VIKA_TOKEN: z.string().trim().min(1),
   VIKA_TIMEOUT_MS: z.string().trim().optional(),
   VIKA_ALLOW_INSECURE_TLS: z.string().trim().optional(),
+  VIKA_PROXY_URL: z.string().trim().optional(),
   VIKA_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).optional(),
-  VIKA_TEST_SPACE_ID: z.string().trim().optional(),
-  VIKA_TEST_NODE_ID: z.string().trim().optional(),
-  VIKA_TEST_DATASHEET_ID: z.string().trim().optional(),
 });
 
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -38,15 +36,23 @@ function normalizeHost(host: string): string {
   return host.replace(/\/+$/, '');
 }
 
+function firstNonEmpty(...values: Array<string | undefined>): string | undefined {
+  for (const value of values) {
+    if (value !== undefined && value !== '') {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
 export interface AppConfig {
   host: string;
   token: string;
   timeoutMs: number;
   allowInsecureTls: boolean;
+  proxyUrl?: string;
   logLevel: LogLevel;
-  testSpaceId?: string;
-  testNodeId?: string;
-  testDatasheetId?: string;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -57,9 +63,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     token: parsed.VIKA_TOKEN,
     timeoutMs: parseNumber(parsed.VIKA_TIMEOUT_MS, 15_000),
     allowInsecureTls: parseBoolean(parsed.VIKA_ALLOW_INSECURE_TLS, false),
+    proxyUrl: firstNonEmpty(parsed.VIKA_PROXY_URL),
     logLevel: parsed.VIKA_LOG_LEVEL ?? 'info',
-    testSpaceId: parsed.VIKA_TEST_SPACE_ID,
-    testNodeId: parsed.VIKA_TEST_NODE_ID,
-    testDatasheetId: parsed.VIKA_TEST_DATASHEET_ID,
   };
 }

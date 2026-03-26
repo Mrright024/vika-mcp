@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { ProxyAgent } from 'undici';
 
 import type { AppConfig } from '../../src/config.js';
 import { CapabilityRegistry } from '../../src/capabilities.js';
@@ -153,6 +154,28 @@ describe('VikaClient', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses a ProxyAgent when VIKA_PROXY_URL is configured', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValueOnce(jsonResponse(200, { success: true, data: { ok: true } }));
+
+    const client = new VikaClient(
+      {
+        ...makeConfig(),
+        proxyUrl: 'http://proxy.test:8080',
+      },
+      new Logger('error'),
+      new CapabilityRegistry(),
+      fetchMock as typeof fetch,
+    );
+
+    await client.request({
+      method: 'GET',
+      path: '/spaces',
+    });
+
+    const [, init] = fetchMock.mock.calls[0]!;
+    expect((init as RequestInit & { dispatcher?: unknown }).dispatcher).toBeInstanceOf(ProxyAgent);
   });
 });
 
