@@ -68,7 +68,7 @@ export interface VikaApiEnvelope<T = unknown> {
 export interface NodeSummary {
   id: string;
   name: string;
-  type: number;
+  type: string;
   icon?: string;
   isFav?: boolean;
   parentId?: string;
@@ -83,7 +83,7 @@ export interface ResolvedNode {
   space_id: string;
   node_id: string;
   name: string;
-  type: number;
+  type: string;
   parent_id?: string;
   permission?: number;
 }

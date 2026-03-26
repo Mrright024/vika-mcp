@@ -35,7 +35,7 @@ You can also run it without a global install:
 npx -y vika-mcp
 ```
 
-The server only talks to documented REST endpoints under `/fusion/v1` and `/fusion/v2`. It does not probe the site root, which avoids SafeLine root-page blocking.
+The server only talks to documented REST endpoints under `/fusion/v1`, `/fusion/v2`, and `/fusion/ai`. It does not probe the site root, which avoids SafeLine root-page blocking.
 
 ### MCPorter Example
 
@@ -66,7 +66,7 @@ If you want MCPorter to start the published npm package directly, add an entry l
 
 Notes:
 
-- `https://vika.cn` is the official public-cloud host example. The token and file paths in this README are placeholders intended for public documentation.
+- `https://vika.cn` is the official public-cloud host example.
 - `${VIKA_TOKEN}` assumes MCPorter will read the token from your shell environment. You can also inline the token directly, but an environment variable is safer.
 - `VIKA_PROXY_URL` is the simplest way to force all Vika traffic through a single proxy.
 - If your private deployment uses a self-signed certificate, add `"VIKA_ALLOW_INSECURE_TLS": "true"` under `env`.
@@ -94,7 +94,7 @@ Quick verification with MCPorter:
 
 ```bash
 npx mcporter list vika --schema
-npx mcporter call vika.vika_spaces_list
+npx mcporter call vika.get_spaces
 ```
 
 ### Development
@@ -113,35 +113,34 @@ This repository also includes a skill at `skills/vika-mcp/`.
 
 Use it when you want an agent to follow the recommended `vika-mcp` workflow instead of guessing raw API calls or tool order. The skill is aligned with the MCP package tool surface and helps with:
 
-- resolving spaces, nodes, and datasheets from names
+- finding spaces and nodes through the official search and detail endpoints
 - inspecting fields before record writes
-- using `fieldKey: "id"` when possible
-- handling destructive tools and deployment-sensitive endpoints safely
+- using `get_records` with `recordIds` for narrow reads
+- handling delete operations and org changes safely
 
 Then invoke it explicitly in prompts such as:
 
 ```text
 Use $vika-mcp to inspect the datasheet named "Leads" and list its fields.
-Use $vika-mcp to update record rec123 in datasheet dst456.
+Use $vika-mcp to search a datasheet node named "Leads" and then update its records.
 ```
 
 The skill complements the MCP server. It does not replace MCP configuration; the `vika-mcp` server still needs to be available to the agent.
 
 ## Tool Surface
 
-- Discovery: `vika_spaces_list`, `vika_nodes_list`, `vika_nodes_children_list`, `vika_nodes_search`, `vika_resolve_node`, `vika_resolve_datasheet`
-- Records: `vika_records_list`, `vika_record_get`, `vika_records_create`, `vika_records_update`, `vika_records_delete`
-- Datasheets and attachments: `vika_datasheets_create`, `vika_attachment_upload`, `vika_embedlinks_list`, `vika_embedlinks_create`, `vika_embedlinks_delete`
-- Fields: `vika_fields_list`, `vika_fields_create`, `vika_fields_update`, `vika_fields_delete`
-- Views: `vika_views_list`, `vika_views_create`, `vika_views_update`, `vika_views_delete`
-- Org: `vika_members_list`, `vika_teams_list`, `vika_teams_create`, `vika_teams_update`, `vika_teams_delete`, `vika_roles_list`, `vika_roles_create`, `vika_roles_update`, `vika_roles_delete`
-- AI: `vika_ai_request`
+- Records: `get_records`, `create_records`, `update_records`, `delete_records`
+- Datasheet reads: `get_fields`, `get_views`, `upload_attachments`
+- Space and nodes: `get_spaces`, `get_nodes`, `search_nodes`, `get_node_details`, `create_embedlinks`, `get_embedlinks`
+- Org: `get_a_member`, `update_a_member`, `delete_a_member`, `list_the_team_members`, `list_teams`, `create_a_team`, `update_a_team`, `delete_a_team`, `list_units_under_the_role`, `list_roles`, `create_a_role`, `update_a_role`, `delete_a_role`
+- AI: `create_chat_completions`
 
 ## Notes
 
-- Delete operations and schema-changing operations require `confirm_destructive: true`.
-- Query serialization follows the official Vika JS SDK bracket style, such as `recordIds[]`.
-- View mutations, org APIs, and AI endpoints are deployment-sensitive. If your private deployment does not expose them, the server returns `feature_unavailable`.
+- MCP tool names follow the official API reference page slugs, converted to snake_case.
+- Delete operations require `confirm_destructive: true`.
+- Search and delete queries follow the public reference examples, such as `permissions=0,1` and `recordIds=recA,recB`.
+- A `403` from a folder or member endpoint is treated as an authorization error for that resource, not as a global capability shutdown.
 
 ## License
 

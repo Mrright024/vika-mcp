@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
-import { nodeIdSchema, optionalStringArraySchema, spaceIdSchema } from '../schemas/common.js';
+import { nodeIdSchema, spaceIdSchema } from '../schemas/common.js';
 import { registerTool, type ToolDependencies, ok } from './common.js';
 
 export function registerNodeTools(server: McpServer, deps: ToolDependencies): void {
@@ -9,17 +9,17 @@ export function registerNodeTools(server: McpServer, deps: ToolDependencies): vo
     server,
     deps,
     {
-      name: 'vika_nodes_list',
+      name: 'get_nodes',
       description: 'List root nodes for a space.',
       inputSchema: z.object({
-        space_id: spaceIdSchema,
+        spaceId: spaceIdSchema,
       }),
       readOnly: true,
-      execute: async ({ space_id }) => {
+      execute: async ({ spaceId }) => {
         const { data, meta } = await deps.client.request({
           method: 'GET',
-          path: `/spaces/${space_id}/nodes`,
-          feature: 'nodes.list',
+          path: `/spaces/${spaceId}/nodes`,
+          feature: 'get_nodes',
         });
         return ok(data, meta);
       },
@@ -30,55 +30,29 @@ export function registerNodeTools(server: McpServer, deps: ToolDependencies): vo
     server,
     deps,
     {
-      name: 'vika_nodes_children_list',
-      description: 'List child nodes for a given folder or node by reading its detail payload.',
+      name: 'search_nodes',
+      description: 'Search nodes in a space through the official v2 search endpoint.',
       inputSchema: z.object({
-        space_id: spaceIdSchema,
-        node_id: nodeIdSchema,
-      }),
-      readOnly: true,
-      execute: async ({ space_id, node_id }) => {
-        const { data, meta } = await deps.client.request<{ children?: unknown[] }>({
-          method: 'GET',
-          path: `/spaces/${space_id}/nodes/${node_id}`,
-          feature: 'nodes.children',
-        });
-
-        return ok(
-          {
-            node: data,
-            children: data.children ?? [],
-          },
-          meta,
-        );
-      },
-    },
-  );
-
-  registerTool(
-    server,
-    deps,
-    {
-      name: 'vika_nodes_search',
-      description: 'Search nodes in a space via the official v2 search endpoint.',
-      inputSchema: z.object({
-        space_id: spaceIdSchema,
-        type: z.number().int().optional().describe('Node type: datasheet=0, mirror=1, folder=2, form=3, dashboard=4.'),
+        spaceId: spaceIdSchema,
+        type: z
+          .string()
+          .optional()
+          .describe('Official node type, for example Datasheet, Folder, Form, Mirror, or Dashboard.'),
         permissions: z.array(z.number().int()).optional(),
         query: z.string().optional(),
       }),
       readOnly: true,
-      execute: async ({ space_id, type, permissions, query }) => {
+      execute: async ({ spaceId, type, permissions, query }) => {
         const { data, meta } = await deps.client.request({
           method: 'GET',
           version: 'v2',
-          path: `/spaces/${space_id}/nodes`,
+          path: `/spaces/${spaceId}/nodes`,
           query: {
             type,
-            permissions,
+            permissions: permissions?.join(','),
             query,
           },
-          feature: 'nodes.search',
+          feature: 'search_nodes',
         });
         return ok(data, meta);
       },
@@ -89,54 +63,20 @@ export function registerNodeTools(server: McpServer, deps: ToolDependencies): vo
     server,
     deps,
     {
-      name: 'vika_resolve_node',
-      description: 'Resolve a node by exact name or explicit node_id.',
+      name: 'get_node_details',
+      description: 'Get details for a single node. Folder nodes may include a children array.',
       inputSchema: z.object({
-        space_id: spaceIdSchema,
-        node_id: nodeIdSchema.optional(),
-        node_name: z.string().min(1).optional(),
-        parent_id: nodeIdSchema.optional(),
-        type: z.number().int().optional(),
-        permissions: z.array(z.number().int()).optional(),
+        spaceId: spaceIdSchema,
+        nodeId: nodeIdSchema,
       }),
       readOnly: true,
-      execute: async ({ space_id, node_id, node_name, parent_id, type, permissions }) => {
-        const resolved = await deps.resolvers.resolveNode({
-          spaceId: space_id,
-          nodeId: node_id,
-          nodeName: node_name,
-          parentId: parent_id,
-          type,
-          permissions,
+      execute: async ({ spaceId, nodeId }) => {
+        const { data, meta } = await deps.client.request({
+          method: 'GET',
+          path: `/spaces/${spaceId}/nodes/${nodeId}`,
+          feature: 'get_node_details',
         });
-        return ok(resolved);
-      },
-    },
-  );
-
-  registerTool(
-    server,
-    deps,
-    {
-      name: 'vika_resolve_datasheet',
-      description: 'Resolve a datasheet node by exact name or explicit node_id.',
-      inputSchema: z.object({
-        space_id: spaceIdSchema,
-        node_id: nodeIdSchema.optional(),
-        node_name: z.string().min(1).optional(),
-        parent_id: nodeIdSchema.optional(),
-        permissions: z.array(z.number().int()).optional(),
-      }),
-      readOnly: true,
-      execute: async ({ space_id, node_id, node_name, parent_id, permissions }) => {
-        const resolved = await deps.resolvers.resolveDatasheet({
-          spaceId: space_id,
-          nodeId: node_id,
-          nodeName: node_name,
-          parentId: parent_id,
-          permissions,
-        });
-        return ok(resolved);
+        return ok(data, meta);
       },
     },
   );

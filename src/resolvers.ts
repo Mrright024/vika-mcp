@@ -3,11 +3,11 @@ import { VikaToolError } from './http/errors.js';
 import type { NodeDetail, NodeSummary, ResolvedDatasheet, ResolvedNode } from './types.js';
 
 export const NODE_TYPE = {
-  DATASHEET: 0,
-  MIRROR: 1,
-  FOLDER: 2,
-  FORM: 3,
-  DASHBOARD: 4,
+  DATASHEET: 'Datasheet',
+  MIRROR: 'Mirror',
+  FOLDER: 'Folder',
+  FORM: 'Form',
+  DASHBOARD: 'Dashboard',
 } as const;
 
 interface ResolveNodeArgs {
@@ -15,7 +15,7 @@ interface ResolveNodeArgs {
   nodeId?: string;
   nodeName?: string;
   parentId?: string;
-  type?: number;
+  type?: string;
   permissions?: number[];
 }
 

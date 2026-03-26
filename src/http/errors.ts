@@ -66,7 +66,7 @@ export function mapUpstreamError(args: {
   requestId?: string;
   feature?: string;
 }): VikaToolError {
-  if (args.feature && [403, 404, 501].includes(args.status)) {
+  if (args.feature && args.status === 501) {
     return featureUnavailableError(args.feature, {
       http_status: args.status,
       upstream_code: args.upstreamCode,

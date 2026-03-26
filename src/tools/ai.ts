@@ -9,24 +9,19 @@ export function registerAiTools(server: McpServer, deps: ToolDependencies): void
     server,
     deps,
     {
-      name: 'vika_ai_request',
-      description:
-        'Generic AI-category request wrapper. Use a relative path under /ai and the documented method/payload for your deployment.',
+      name: 'create_chat_completions',
+      description: 'Call the documented chat completions endpoint under /fusion/ai/{assistantId}/chat/completions.',
       inputSchema: z.object({
-        method: z.enum(['GET', 'POST', 'PATCH', 'PUT', 'DELETE']),
-        relative_path: z.string().min(1).describe('Relative path under /fusion/v1/ai, without the /ai prefix.'),
-        query: jsonObjectSchema.optional(),
+        assistantId: z.string().min(1).describe('Assistant ID from the official API path.'),
         payload: jsonObjectSchema.optional(),
       }),
-      execute: async ({ method, relative_path, query, payload }) => {
-        const normalizedPath = relative_path.replace(/^\/+/, '');
+      execute: async ({ assistantId, payload }) => {
         const { data, meta } = await deps.client.request({
-          method,
-          path: `/ai/${normalizedPath}`,
-          query,
+          method: 'POST',
+          path: `/fusion/ai/${assistantId}/chat/completions`,
           body: payload,
-          feature: 'ai',
-          idempotent: method === 'GET',
+          feature: 'create_chat_completions',
+          idempotent: false,
         });
         return ok(data, meta);
       },

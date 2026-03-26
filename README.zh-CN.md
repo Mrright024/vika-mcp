@@ -1,7 +1,6 @@
 # vika-mcp
 
 通过 `stdio` 访问 Vika 数据表的 TypeScript MCP 服务。
-
 英文说明见 [README.md](./README.md)。
 
 ## 环境变量
@@ -35,7 +34,7 @@ npm install -g vika-mcp
 npx -y vika-mcp
 ```
 
-服务端只调用 `/fusion/v1` 和 `/fusion/v2` 下的公开 REST 接口，不会探测站点根路径，从而避免部分部署场景下的 SafeLine 根路径拦截问题。
+服务端只调用 `/fusion/v1`、`/fusion/v2` 和 `/fusion/ai` 下的公开 REST 接口，不会探测站点根路径，从而避免部分部署场景下的 SafeLine 根路径拦截问题。
 
 ### MCPorter 配置示例
 
@@ -66,7 +65,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 
 说明：
 
-- `https://vika.cn` 是公开云版本的官方示例地址。本文中的 token 和路径仍为公开文档使用的占位值，不包含任何真实环境信息。
+- `https://vika.cn` 是公开云版本的官方示例地址。
 - `${VIKA_TOKEN}` 表示由 MCPorter 从当前 shell 环境读取 token。也可以直接写死，但环境变量更安全。
 - `VIKA_PROXY_URL` 是最简单的代理方式，会让全部 Vika 请求走同一个代理。
 - 如果你的私有部署使用自签名证书，可以在 `env` 中加入 `"VIKA_ALLOW_INSECURE_TLS": "true"`。
@@ -94,7 +93,7 @@ MCPorter 支持读取项目级配置 `config/mcporter.json`，也支持读取用
 
 ```bash
 npx mcporter list vika --schema
-npx mcporter call vika.vika_spaces_list
+npx mcporter call vika.get_spaces
 ```
 
 ### 开发模式
@@ -109,39 +108,38 @@ node dist/index.js
 
 ### Agent Skill
 
-这个仓库还附带了一份skill，位于 `skills/vika-mcp/`。
+这个仓库还附带了一份 skill，位于 `skills/vika-mcp/`。
 
 当你希望 agent 按推荐的 `vika-mcp` 使用方式工作，而不是自己猜 HTTP 调用或工具顺序时，就应该配合这个 skill 使用。它和 MCP 包暴露的工具面保持一致，主要帮助 agent：
 
-- 先从名称解析 space、node 和 datasheet
+- 通过官方搜索和详情接口定位空间站与节点
 - 在写记录前先读取字段信息
-- 优先使用 `fieldKey: "id"`
-- 更稳妥地处理 destructive 工具和部署敏感接口
+- 用 `get_records + recordIds` 做更窄的读取
+- 更稳妥地处理删除操作和组织管理接口
 
 之后可以在提示词里显式触发，例如：
 
 ```text
 Use $vika-mcp to inspect the datasheet named "Leads" and list its fields.
-Use $vika-mcp to update record rec123 in datasheet dst456.
+Use $vika-mcp to search a datasheet node named "Leads" and then update its records.
 ```
 
 这个 skill 只是对 MCP 的补充，不会替代 MCP 配置本身。agent 仍然需要先能访问 `vika-mcp` 服务器。
 
 ## 工具列表
 
-- 发现类：`vika_spaces_list`、`vika_nodes_list`、`vika_nodes_children_list`、`vika_nodes_search`、`vika_resolve_node`、`vika_resolve_datasheet`
-- 记录类：`vika_records_list`、`vika_record_get`、`vika_records_create`、`vika_records_update`、`vika_records_delete`
-- 数据表与附件：`vika_datasheets_create`、`vika_attachment_upload`、`vika_embedlinks_list`、`vika_embedlinks_create`、`vika_embedlinks_delete`
-- 字段类：`vika_fields_list`、`vika_fields_create`、`vika_fields_update`、`vika_fields_delete`
-- 视图类：`vika_views_list`、`vika_views_create`、`vika_views_update`、`vika_views_delete`
-- 组织类：`vika_members_list`、`vika_teams_list`、`vika_teams_create`、`vika_teams_update`、`vika_teams_delete`、`vika_roles_list`、`vika_roles_create`、`vika_roles_update`、`vika_roles_delete`
-- AI 类：`vika_ai_request`
+- 记录类：`get_records`、`create_records`、`update_records`、`delete_records`
+- 数据表读取：`get_fields`、`get_views`、`upload_attachments`
+- 空间站与节点：`get_spaces`、`get_nodes`、`search_nodes`、`get_node_details`、`create_embedlinks`、`get_embedlinks`
+- 组织类：`get_a_member`、`update_a_member`、`delete_a_member`、`list_the_team_members`、`list_teams`、`create_a_team`、`update_a_team`、`delete_a_team`、`list_units_under_the_role`、`list_roles`、`create_a_role`、`update_a_role`、`delete_a_role`
+- AI 类：`create_chat_completions`
 
 ## 说明
 
-- 删除操作和变更 schema 的操作都要求显式传入 `confirm_destructive: true`。
-- 查询参数序列化遵循官方 Vika JS SDK 的 bracket 风格，例如 `recordIds[]`。
-- 视图变更、组织接口和 AI 接口是否可用取决于具体部署。如果部署未开放这些接口，服务会返回 `feature_unavailable`。
+- MCP 工具名严格跟随官方 API reference 子页面 slug，并转换为 snake_case。
+- 删除操作要求显式传入 `confirm_destructive: true`。
+- 搜索和删除的查询参数遵循公开文档示例，例如 `permissions=0,1` 和 `recordIds=recA,recB`。
+- 文件夹或成员接口返回 `403` 时，会按该资源无权限处理，不会把整个接口能力全局熔断。
 
 ## 许可证
 

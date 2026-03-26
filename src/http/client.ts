@@ -139,7 +139,7 @@ export class VikaClient {
         );
 
         if (!response.ok || parsed.envelope.success === false) {
-          if (options.feature && [403, 404, 501].includes(response.status)) {
+          if (options.feature && response.status === 501) {
             this.capabilities.markUnavailable(options.feature);
           }
 

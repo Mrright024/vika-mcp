@@ -28,7 +28,7 @@ function jsonResponse(status: number, body: unknown, headers?: Record<string, st
 }
 
 describe('VikaClient', () => {
-  it('injects authorization and serializes arrays with bracket syntax', async () => {
+  it('injects authorization and serializes preformatted reference query values', async () => {
     const fetchMock = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) =>
       jsonResponse(
         200,
@@ -47,8 +47,8 @@ describe('VikaClient', () => {
       method: 'GET',
       path: '/datasheets/dst123/records',
       query: {
-        recordIds: ['recA', 'recB'],
-        sort: [{ field: 'fldA', order: 'asc' }],
+        recordIds: 'recA,recB',
+        sort: JSON.stringify({ field: 'fldA', order: 'asc' }),
       },
       feature: 'records.list',
     });
@@ -60,10 +60,8 @@ describe('VikaClient', () => {
 
     expect(headers.get('Authorization')).toBe('Bearer secret-token');
     expect(url).toContain('/fusion/v1/datasheets/dst123/records?');
-    expect(url).toContain('recordIds[]=recA');
-    expect(url).toContain('recordIds[]=recB');
-    expect(url).toContain('sort[][field]=fldA');
-    expect(url).toContain('sort[][order]=asc');
+    expect(url).toContain('recordIds=recA,recB');
+    expect(url).toContain('sort={"field":"fldA","order":"asc"}');
   });
 
   it('retries idempotent GET requests on 429', async () => {
@@ -122,12 +120,12 @@ describe('VikaClient', () => {
     });
   });
 
-  it('caches feature_unavailable after a 404 on feature-gated endpoints', async () => {
+  it('caches feature_unavailable after a 501 on feature-gated endpoints', async () => {
     const capabilities = new CapabilityRegistry();
     const fetchMock = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        jsonResponse(404, { success: false, code: 404, message: 'The API does not exist' }, { 'request-id': 'req-404' }),
+        jsonResponse(501, { success: false, code: 501, message: 'The API does not exist' }, { 'request-id': 'req-501' }),
       );
 
     const client = new VikaClient(makeConfig(), new Logger('error'), capabilities, fetchMock as typeof fetch);
@@ -140,7 +138,7 @@ describe('VikaClient', () => {
       }),
     ).rejects.toMatchObject({
       category: 'feature_unavailable',
-      httpStatus: 404,
+      httpStatus: 501,
     });
 
     await expect(
@@ -154,6 +152,28 @@ describe('VikaClient', () => {
     });
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not cache authorization failures as feature_unavailable', async () => {
+    const capabilities = new CapabilityRegistry();
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(jsonResponse(403, { success: false, code: 602, message: 'forbidden' }));
+
+    const client = new VikaClient(makeConfig(), new Logger('error'), capabilities, fetchMock as typeof fetch);
+
+    await expect(
+      client.request({
+        method: 'GET',
+        path: '/spaces/spc123/nodes/fld123',
+        feature: 'get_node_details',
+      }),
+    ).rejects.toMatchObject({
+      category: 'authorization',
+      httpStatus: 403,
+    });
+
+    expect(capabilities.isUnavailable('get_node_details')).toBe(false);
   });
 
   it('uses a ProxyAgent when VIKA_PROXY_URL is configured', async () => {

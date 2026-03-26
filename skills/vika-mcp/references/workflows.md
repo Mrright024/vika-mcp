@@ -4,75 +4,67 @@
 
 Use this sequence when the user gives names instead of IDs:
 
-1. Call `vika_spaces_list` if `space_id` is unknown.
-2. Call `vika_resolve_datasheet` with `space_id` and `node_name`.
-3. Reuse the returned `datasheet_id` and `node_id` for later calls.
+1. Call `get_spaces` if `spaceId` is unknown.
+2. Call `search_nodes` with `spaceId`, `type: "Datasheet"`, and the target name in `query`.
+3. If the user gave a folder first, call `get_node_details` on that folder and match the child node there.
+4. Reuse the returned `nodeId` as the `datasheetId` for record, field, and view reads.
 
 ## Inspect schema before record writes
 
-Use this sequence before `vika_records_create` or `vika_records_update`:
+Use this sequence before `create_records` or `update_records`:
 
-1. Call `vika_fields_list`.
-2. Record the field IDs, names, and types you actually need.
-3. Build write payloads with `fieldKey: "id"` when possible.
+1. Call `get_fields`.
+2. Record the field names and types you actually need.
+3. Build write payloads that match the current datasheet schema.
 
 ## Read records safely
 
-Pick the narrowest read tool that fits:
+Pick the narrowest read shape that fits:
 
-- Use `vika_record_get` when the user already knows the record ID.
-- Use `vika_records_list` when the user needs filtering, sorting, pagination, or view-based reads.
-- If the user refers to fields by name, read the field list first so you can map names to IDs.
+- Use `get_records` with `recordIds` when the user already knows the target record IDs.
+- Use `get_records` with `viewId`, `filterByFormula`, `maxRecords`, or `sort` when the user needs filtered or paginated reads.
+- If the user refers to fields by name, call `get_fields` first.
 
 ## Update records safely
 
 Use this sequence for updates:
 
-1. Call `vika_fields_list`.
-2. Build the payload with explicit field IDs.
-3. Call `vika_records_update`.
+1. Call `get_fields`.
+2. Build the update payload with the current field names and values.
+3. Call `update_records`.
 4. Echo back the record IDs and the fields you changed.
 
 ## Attachment flow
 
 Use this sequence for file attachments:
 
-1. Call `vika_attachment_upload` with the local file path.
+1. Call `upload_attachments` with the local file path.
 2. Take the returned attachment object or list item exactly as returned.
-3. Call `vika_records_update` and assign that attachment payload to the attachment field.
+3. Call `update_records` and assign that attachment payload to the attachment field.
 
-## Destructive tools
+## Delete operations
 
 These tools require `confirm_destructive: true`:
 
-- `vika_records_delete`
-- `vika_datasheets_create`
-- `vika_fields_create`
-- `vika_fields_update`
-- `vika_fields_delete`
-- `vika_views_create`
-- `vika_views_update`
-- `vika_views_delete`
-- `vika_teams_create`
-- `vika_teams_update`
-- `vika_teams_delete`
-- `vika_roles_create`
-- `vika_roles_update`
-- `vika_roles_delete`
-- `vika_embedlinks_delete`
+- `delete_records`
+- `delete_a_member`
+- `delete_a_team`
+- `delete_a_role`
 
 Before calling one of them:
 
 1. Confirm the target object and scope.
-2. Restate what will change.
+2. Restate what will be removed.
 3. Only then send `confirm_destructive: true`.
 
-## Deployment-sensitive endpoints
+## Organization flows
 
-Treat these as optional by deployment:
+- Use `list_teams` with `teamId: "0"` for top-level teams.
+- Use `list_the_team_members` when the user asks for the members of a known team.
+- Use `list_roles` to discover role IDs before `list_units_under_the_role`, `update_a_role`, or `delete_a_role`.
+- Use `get_a_member` before `update_a_member` when the user only gives a member identifier and wants to inspect the current state first.
 
-- Views
-- Teams and roles
-- AI endpoints
+## AI endpoint
 
-If one of these returns `feature_unavailable`, explain that the current Vika deployment does not expose that endpoint and continue with a fallback path if one exists.
+- `create_chat_completions` maps to the public `/fusion/ai/{assistantId}/chat/completions` endpoint.
+- Only call it when the user has provided or can infer a valid `assistantId`.
