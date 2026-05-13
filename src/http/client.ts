@@ -239,7 +239,7 @@ export class VikaClient {
   private buildUrl(path: string, version: ApiVersion, query?: QueryParams): string {
     const base = path.startsWith('http')
       ? new URL(path)
-      : path.startsWith('/fusion/')
+      : path.startsWith('/fusion/') || path.startsWith('/api/')
         ? new URL(path, this.config.host)
         : new URL(`${this.config.host}/fusion/${version}${path}`);
 
