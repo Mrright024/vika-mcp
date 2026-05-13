@@ -66,6 +66,8 @@ These tools require `confirm_destructive: true`:
 - `delete_records`
 - `delete_fields`
 - `delete_embedlinks`
+- `delete_view`
+- `delete_views`
 - `delete_a_member`
 - `delete_a_team`
 - `delete_a_role`
@@ -82,6 +84,18 @@ Before calling one of them:
 - Use `list_the_team_members` when the user asks for the members of a known team.
 - Use `list_roles` to discover role IDs before `list_units_under_the_role`, `update_a_role`, or `delete_a_role`.
 - Use `get_a_member` before `update_a_member` when the user only gives a member identifier and wants to inspect the current state first.
+
+## View management
+
+Use this sequence when the user wants to manage datasheet views:
+
+1. Confirm the target `datasheetId` (resolve from names if needed).
+2. Call `get_views` to list existing views and their IDs.
+3. For creating: call `create_view` with `type` and optional `name`, `columns`, `sortInfo`, `groupInfo`, `filterInfo`.
+4. For updating: call `update_view` with the target `viewId` and the properties to change (name, lockInfo, autoSave, sequence).
+5. For copying: call `copy_view` with the source `viewId` and optional new name.
+6. For single deletion: call `delete_view` with `viewId` and `confirm_destructive: true`.
+7. For batch deletion: call `delete_views` with an array of `viewIds` and `confirm_destructive: true`.
 
 ## AI endpoint
 
