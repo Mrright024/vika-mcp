@@ -131,7 +131,7 @@ The skill complements the MCP server. It does not replace MCP configuration; the
 
 - Records: `get_records`, `create_records`, `update_records`, `delete_records`
 - Fields: `get_fields`, `create_fields`, `delete_fields`
-- Views: `get_views`, `create_view`, `delete_view`, `update_view`, `copy_view`
+- Views: `get_views`, `create_view`, `delete_view`, `delete_views`, `update_view`, `copy_view`
 - Datasheet reads: `upload_attachments`
 - Datasheet writes: `create_datasheets`, `import_from_excel`
 - Space and nodes: `get_spaces`, `get_nodes`, `search_nodes`, `get_node_details`, `create_embedlinks`, `get_embedlinks`, `delete_embedlinks`

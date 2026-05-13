@@ -130,7 +130,7 @@ Use $vika-mcp to search a datasheet node named "Leads" and then update its recor
 
 - 记录类：`get_records`、`create_records`、`update_records`、`delete_records`
 - 字段类：`get_fields`、`create_fields`、`delete_fields`
-- 视图类：`get_views`、`create_view`、`delete_view`、`update_view`、`copy_view`
+- 视图类：`get_views`、`create_view`、`delete_view`、`delete_views`、`update_view`、`copy_view`
 - 数据表读取：`upload_attachments`
 - 数据表写入：`create_datasheets`、`import_from_excel`
 - 空间站与节点：`get_spaces`、`get_nodes`、`search_nodes`、`get_node_details`、`create_embedlinks`、`get_embedlinks`、`delete_embedlinks`

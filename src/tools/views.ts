@@ -77,6 +77,31 @@ export function registerViewTools(server: McpServer, deps: ToolDependencies): vo
     server,
     deps,
     {
+      name: 'delete_views',
+      description: 'Batch-delete multiple views from a datasheet.',
+      inputSchema: z.object({
+        datasheetId: datasheetIdSchema,
+        viewIds: z.array(z.string().min(1)).min(1).describe('View IDs to delete.'),
+        confirm_destructive: z.boolean().optional(),
+      }),
+      execute: async ({ datasheetId, viewIds, confirm_destructive }) => {
+        requireDestructiveConfirmation(confirm_destructive);
+        const { data, meta } = await deps.client.request({
+          method: 'DELETE',
+          path: `/datasheets/${datasheetId}/views`,
+          query: { viewIds: viewIds.join(',') },
+          feature: 'delete_views',
+          idempotent: false,
+        });
+        return ok(data, meta);
+      },
+    },
+  );
+
+  registerTool(
+    server,
+    deps,
+    {
       name: 'update_view',
       description: 'Edit or reposition a view in a datasheet.',
       inputSchema: z.object({
@@ -86,7 +111,7 @@ export function registerViewTools(server: McpServer, deps: ToolDependencies): vo
       }),
       execute: async ({ datasheetId, viewId, payload }) => {
         const { data, meta } = await deps.client.request({
-          method: 'PATCH',
+          method: 'PUT',
           path: `/datasheets/${datasheetId}/views/${viewId}`,
           body: payload,
           feature: 'update_view',
@@ -111,7 +136,7 @@ export function registerViewTools(server: McpServer, deps: ToolDependencies): vo
       execute: async ({ datasheetId, viewId, payload }) => {
         const { data, meta } = await deps.client.request({
           method: 'POST',
-          path: `/datasheets/${datasheetId}/views/${viewId}/copy`,
+          path: `/datasheets/${datasheetId}/views/${viewId}/duplicate`,
           body: payload,
           feature: 'copy_view',
           idempotent: false,
