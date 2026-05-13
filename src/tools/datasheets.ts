@@ -2,7 +2,7 @@ import * as z from 'zod/v4';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
 import { datasheetIdSchema, jsonObjectSchema, nodeIdSchema, spaceIdSchema } from '../schemas/common.js';
-import { registerTool, type ToolDependencies, ok } from './common.js';
+import { registerTool, type ToolDependencies, ok, requireDestructiveConfirmation } from './common.js';
 
 export function registerDatasheetTools(server: McpServer, deps: ToolDependencies): void {
   registerTool(
@@ -98,6 +98,31 @@ export function registerDatasheetTools(server: McpServer, deps: ToolDependencies
           path: `/spaces/${spaceId}/nodes/${nodeId}/embedlinks`,
           body: payload,
           feature: 'create_embedlinks',
+          idempotent: false,
+        });
+        return ok(data, meta);
+      },
+    },
+  );
+
+  registerTool(
+    server,
+    deps,
+    {
+      name: 'delete_embedlinks',
+      description: 'Delete an embed link for a file node.',
+      inputSchema: z.object({
+        spaceId: spaceIdSchema,
+        nodeId: nodeIdSchema,
+        linkId: z.string().min(1).describe('Embed link ID.'),
+        confirm_destructive: z.boolean().optional(),
+      }),
+      execute: async ({ spaceId, nodeId, linkId, confirm_destructive }) => {
+        requireDestructiveConfirmation(confirm_destructive);
+        const { data, meta } = await deps.client.request({
+          method: 'DELETE',
+          path: `/spaces/${spaceId}/nodes/${nodeId}/embedlinks/${linkId}`,
+          feature: 'delete_embedlinks',
           idempotent: false,
         });
         return ok(data, meta);
