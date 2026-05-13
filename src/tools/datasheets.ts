@@ -9,6 +9,30 @@ export function registerDatasheetTools(server: McpServer, deps: ToolDependencies
     server,
     deps,
     {
+      name: 'import_from_excel',
+      description: 'Import an Excel file and create a new datasheet.',
+      inputSchema: z.object({
+        spaceId: spaceIdSchema,
+        payload: jsonObjectSchema.describe('Import options including file info and target folder.'),
+      }),
+      execute: async ({ spaceId, payload }) => {
+        const { data, meta } = await deps.client.request({
+          method: 'POST',
+          path: '/api/v1/node/import',
+          body: payload,
+          headers: { 'X-Space-Id': spaceId },
+          feature: 'import_from_excel',
+          idempotent: false,
+        });
+        return ok(data, meta);
+      },
+    },
+  );
+
+  registerTool(
+    server,
+    deps,
+    {
       name: 'create_datasheets',
       description: 'Create a new datasheet in a space.',
       inputSchema: z.object({
