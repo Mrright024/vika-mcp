@@ -9,6 +9,33 @@ export function registerDatasheetTools(server: McpServer, deps: ToolDependencies
     server,
     deps,
     {
+      name: 'create_datasheets',
+      description: 'Create a new datasheet in a space.',
+      inputSchema: z.object({
+        spaceId: spaceIdSchema,
+        name: z.string().min(1).describe('Datasheet name.'),
+        description: z.string().optional().describe('Datasheet description.'),
+        folderId: z.string().optional().describe('Parent folder ID. Defaults to workspace root.'),
+        preNodeId: z.string().optional().describe('Previous node ID for positioning.'),
+        fields: z.array(jsonObjectSchema).optional().describe('Field definitions for the new datasheet.'),
+      }),
+      execute: async ({ spaceId, name, description, folderId, preNodeId, fields }) => {
+        const { data, meta } = await deps.client.request({
+          method: 'POST',
+          path: `/spaces/${spaceId}/datasheets`,
+          body: { name, description, folderId, preNodeId, fields },
+          feature: 'create_datasheets',
+          idempotent: false,
+        });
+        return ok(data, meta);
+      },
+    },
+  );
+
+  registerTool(
+    server,
+    deps,
+    {
       name: 'upload_attachments',
       description: 'Upload a single file to a datasheet attachment endpoint.',
       inputSchema: z.object({
