@@ -129,8 +129,10 @@ Use $vika-mcp to search a datasheet node named "Leads" and then update its recor
 ## 工具列表
 
 - 记录类：`get_records`、`create_records`、`update_records`、`delete_records`
-- 数据表读取：`get_fields`、`get_views`、`upload_attachments`
-- 空间站与节点：`get_spaces`、`get_nodes`、`search_nodes`、`get_node_details`、`create_embedlinks`、`get_embedlinks`
+- 字段类：`get_fields`、`create_fields`、`delete_fields`
+- 数据表读取：`get_views`、`upload_attachments`
+- 数据表写入：`create_datasheets`
+- 空间站与节点：`get_spaces`、`get_nodes`、`search_nodes`、`get_node_details`、`create_embedlinks`、`get_embedlinks`、`delete_embedlinks`
 - 组织类：`get_a_member`、`update_a_member`、`delete_a_member`、`list_the_team_members`、`list_teams`、`create_a_team`、`update_a_team`、`delete_a_team`、`list_units_under_the_role`、`list_roles`、`create_a_role`、`update_a_role`、`delete_a_role`
 - AI 类：`create_chat_completions`
 

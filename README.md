@@ -130,8 +130,10 @@ The skill complements the MCP server. It does not replace MCP configuration; the
 ## Tool Surface
 
 - Records: `get_records`, `create_records`, `update_records`, `delete_records`
-- Datasheet reads: `get_fields`, `get_views`, `upload_attachments`
-- Space and nodes: `get_spaces`, `get_nodes`, `search_nodes`, `get_node_details`, `create_embedlinks`, `get_embedlinks`
+- Fields: `get_fields`, `create_fields`, `delete_fields`
+- Datasheet reads: `get_views`, `upload_attachments`
+- Datasheet writes: `create_datasheets`
+- Space and nodes: `get_spaces`, `get_nodes`, `search_nodes`, `get_node_details`, `create_embedlinks`, `get_embedlinks`, `delete_embedlinks`
 - Org: `get_a_member`, `update_a_member`, `delete_a_member`, `list_the_team_members`, `list_teams`, `create_a_team`, `update_a_team`, `delete_a_team`, `list_units_under_the_role`, `list_roles`, `create_a_role`, `update_a_role`, `delete_a_role`
 - AI: `create_chat_completions`
 

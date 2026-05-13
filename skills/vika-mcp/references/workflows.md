@@ -34,6 +34,23 @@ Use this sequence for updates:
 3. Call `update_records`.
 4. Echo back the record IDs and the fields you changed.
 
+## Create a datasheet
+
+Use this sequence when the user wants a new table:
+
+1. Confirm the target `spaceId` (call `get_spaces` if unknown).
+2. Optionally call `get_node_details` on a folder to position the new datasheet.
+3. Call `create_datasheets` with `name` and optional `fields`, `folderId`, or `preNodeId`.
+4. Return the new `datasheetId` and `fieldId` list from the response.
+
+## Create a field
+
+Use this sequence when the user wants to add a column:
+
+1. Confirm the target `spaceId` and `datasheetId`.
+2. Call `get_fields` to inspect existing schema and avoid name collisions.
+3. Call `create_fields` with `type`, `name`, and optional `property`.
+
 ## Attachment flow
 
 Use this sequence for file attachments:
@@ -47,6 +64,8 @@ Use this sequence for file attachments:
 These tools require `confirm_destructive: true`:
 
 - `delete_records`
+- `delete_fields`
+- `delete_embedlinks`
 - `delete_a_member`
 - `delete_a_team`
 - `delete_a_role`

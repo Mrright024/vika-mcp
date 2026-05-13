@@ -35,10 +35,15 @@ Use this skill to operate Vika through the `vika-mcp` MCP tools instead of compo
   - `create_records`
   - `update_records`
   - `delete_records`
-- Datasheet reads:
+- Fields:
   - `get_fields`
+  - `create_fields`
+  - `delete_fields`
+- Datasheet reads:
   - `get_views`
   - `upload_attachments`
+- Datasheet writes:
+  - `create_datasheets`
 - Space and nodes:
   - `get_spaces`
   - `get_nodes`
@@ -46,6 +51,7 @@ Use this skill to operate Vika through the `vika-mcp` MCP tools instead of compo
   - `get_node_details`
   - `create_embedlinks`
   - `get_embedlinks`
+  - `delete_embedlinks`
 - Org:
   - `get_a_member`
   - `update_a_member`
