@@ -4,6 +4,7 @@ import type { ToolDependencies } from './common.js';
 import { registerAiTools } from './ai.js';
 import { registerDatasheetTools } from './datasheets.js';
 import { registerFieldTools } from './fields.js';
+import { registerFormTools } from './forms.js';
 import { registerNodeManagementTools } from './node-management.js';
 import { registerNodeTools } from './nodes.js';
 import { registerOrgTools } from './org.js';
@@ -18,6 +19,7 @@ export function registerAllTools(server: McpServer, deps: ToolDependencies): voi
   registerDatasheetTools(server, deps);
   registerRecordTools(server, deps);
   registerFieldTools(server, deps);
+  registerFormTools(server, deps);
   registerViewTools(server, deps);
   registerOrgTools(server, deps);
   registerAiTools(server, deps);
