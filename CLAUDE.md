@@ -35,10 +35,12 @@ src/
     common.ts       — ToolDefinition interface, ok/fail helpers, registerTool wrapper
     spaces.ts       — get_spaces
     nodes.ts        — get_nodes, search_nodes, get_node_details
-    datasheets.ts   — upload_attachments, get_embedlinks, create_embedlinks, delete_embedlinks, create_datasheets
+    node-management.ts — create_node, update_node, delete_node, copy_node, move_node, recover_node, get_node_showcase
+    datasheets.ts   — upload_attachments, get_embedlinks, create_embedlinks, delete_embedlinks, create_datasheets, import_from_excel
     records.ts      — get_records, create_records, update_records, delete_records
     fields.ts       — get_fields, create_fields, delete_fields
-    views.ts        — get_views
+    views.ts        — get_views, create_view, delete_view, update_view, copy_view
+    forms.ts        — get_form_fields, submit_form, create_form_share_link, get_form_association, update_form_share
     org.ts          — member/team/role CRUD tools
     ai.ts           — create_chat_completions
 ```

@@ -131,9 +131,12 @@ The skill complements the MCP server. It does not replace MCP configuration; the
 
 - Records: `get_records`, `create_records`, `update_records`, `delete_records`
 - Fields: `get_fields`, `create_fields`, `delete_fields`
-- Datasheet reads: `get_views`, `upload_attachments`
-- Datasheet writes: `create_datasheets`
+- Views: `get_views`, `create_view`, `delete_view`, `update_view`, `copy_view`
+- Datasheet reads: `upload_attachments`
+- Datasheet writes: `create_datasheets`, `import_from_excel`
 - Space and nodes: `get_spaces`, `get_nodes`, `search_nodes`, `get_node_details`, `create_embedlinks`, `get_embedlinks`, `delete_embedlinks`
+- Node management: `create_node`, `update_node`, `delete_node`, `copy_node`, `move_node`, `recover_node`, `get_node_showcase`
+- Forms: `get_form_fields`, `submit_form`, `create_form_share_link`, `get_form_association`, `update_form_share`
 - Org: `get_a_member`, `update_a_member`, `delete_a_member`, `list_the_team_members`, `list_teams`, `create_a_team`, `update_a_team`, `delete_a_team`, `list_units_under_the_role`, `list_roles`, `create_a_role`, `update_a_role`, `delete_a_role`
 - AI: `create_chat_completions`
 

@@ -130,9 +130,12 @@ Use $vika-mcp to search a datasheet node named "Leads" and then update its recor
 
 - 记录类：`get_records`、`create_records`、`update_records`、`delete_records`
 - 字段类：`get_fields`、`create_fields`、`delete_fields`
-- 数据表读取：`get_views`、`upload_attachments`
-- 数据表写入：`create_datasheets`
+- 视图类：`get_views`、`create_view`、`delete_view`、`update_view`、`copy_view`
+- 数据表读取：`upload_attachments`
+- 数据表写入：`create_datasheets`、`import_from_excel`
 - 空间站与节点：`get_spaces`、`get_nodes`、`search_nodes`、`get_node_details`、`create_embedlinks`、`get_embedlinks`、`delete_embedlinks`
+- 节点管理：`create_node`、`update_node`、`delete_node`、`copy_node`、`move_node`、`recover_node`、`get_node_showcase`
+- 表单类：`get_form_fields`、`submit_form`、`create_form_share_link`、`get_form_association`、`update_form_share`
 - 组织类：`get_a_member`、`update_a_member`、`delete_a_member`、`list_the_team_members`、`list_teams`、`create_a_team`、`update_a_team`、`delete_a_team`、`list_units_under_the_role`、`list_roles`、`create_a_role`、`update_a_role`、`delete_a_role`
 - AI 类：`create_chat_completions`
 
